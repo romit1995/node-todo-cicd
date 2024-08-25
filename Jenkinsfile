@@ -3,37 +3,32 @@ pipeline {
     
     stages {
         
-        stage("code"){
+        stage("Code"){
             steps{
-                git url: "https://github.com/LondheShubham153/node-todo-cicd.git", branch: "master"
-                echo 'bhaiyya code clone ho gaya'
+                git url: "https://github.com/romit1995/node-todo-cicd.git", branch: "master"
+                echo 'Code cloning is complete'
             }
         }
-        stage("build and test"){
+        stage("Build and Test"){
             steps{
-                sh "docker build -t node-app-test-new ."
-                echo 'code build bhi ho gaya'
+                sh "docker build -t node-todo-test ."
+                echo 'code build successfully'
             }
         }
-        stage("scan image"){
-            steps{
-                echo 'image scanning ho gayi'
-            }
-        }
-        stage("push"){
+        stage("Push"){
             steps{
                 withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
                 sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker tag node-app-test-new:latest ${env.dockerHubUser}/node-app-test-new:latest"
+                sh "docker tag node-todo-test:latest ${env.dockerHubUser}/node-todo-test:latest"
                 sh "docker push ${env.dockerHubUser}/node-app-test-new:latest"
-                echo 'image push ho gaya'
+                echo 'Image is pushed'
                 }
             }
         }
-        stage("deploy"){
+        stage("Deploy"){
             steps{
-                sh "docker-compose down && docker-compose up -d"
-                echo 'deployment ho gayi'
+                sh "docker-compose down && docker-compose up -d --no-deps --build web"
+                echo 'Deployment success'
             }
         }
     }
